@@ -27,48 +27,48 @@
 <body>
 
   <!-- Fixed 3D WebGL Canvas Layer -->
-  <div id="webgl-canvas-container">
+  <div id="webgl-canvas-container" aria-hidden="true">
     <canvas id="webgl-canvas"></canvas>
   </div>
-  <div class="canvas-vignette"></div>
+  <div class="canvas-vignette" aria-hidden="true"></div>
 
   <!-- HUD Top Navigation Bar -->
-  <header class="hud-header">
+  <header class="hud-header" role="banner">
     <div class="hud-nav-container">
-      <a href="#hero-section" class="brand-logo" id="brand-logo-link">
+      <a href="#hero-section" class="brand-logo" id="brand-logo-link" aria-label="FocusList 3D Home">
         <div class="logo-orb">
           <svg viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
         </div>
         <div>
           <span class="brand-title">FocusList<span style="font-weight:400; opacity:0.8; font-size: 0.9em;"> 3D</span></span>
-          <span class="brand-tag">FAIE CHALLENGE</span>
+          <span class="brand-tag">FAIE BENCHMARK</span>
         </div>
       </a>
 
-      <nav>
+      <nav role="navigation" aria-label="Main Navigation">
         <ul class="nav-links">
           <li><a href="#hero-section" class="nav-link active">Home</a></li>
-          <li><a href="#matrix-section" class="nav-link">3D Matrix</a></li>
           <li><a href="#tasks-section" class="nav-link">Tasks</a></li>
+          <li><a href="#matrix-section" class="nav-link">3D Solar Matrix</a></li>
         </ul>
       </nav>
 
       <div class="nav-actions">
         <!-- Live 1-Hour FAIE Challenge Countdown -->
-        <div class="hud-btn" id="hud-timer-badge" title="FAIE 1-Hour Challenge Timer">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+        <div class="hud-btn" id="hud-timer-badge" title="FAIE 1-Hour Challenge Timer" role="status" aria-label="FAIE Challenge Timer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
           <span id="countdown-timer" style="font-family: var(--font-display); font-weight: 700; color: var(--accent-cyan);">60:00</span>
         </div>
 
         <!-- Theme Switcher -->
-        <button class="hud-btn" id="theme-toggle-btn" title="Cycle Sci-Fi Themes (Cyberpunk / Gold / Matrix)">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        <button type="button" class="hud-btn" id="theme-toggle-btn" title="Cycle Sci-Fi Themes (Cyberpunk / Gold / Matrix)" aria-label="Toggle Color Theme">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
           <span>Theme</span>
         </button>
 
         <!-- Ambient Sound Toggle -->
-        <button class="hud-btn" id="ambient-toggle-btn" title="Toggle Procedural Ambient Sound">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        <button type="button" class="hud-btn" id="ambient-toggle-btn" title="Toggle Procedural Ambient Sound" aria-label="Toggle Synthesizer Audio">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
           <span>Audio</span>
         </button>
       </div>
@@ -76,8 +76,8 @@
   </header>
 
   <!-- Main Content Structure -->
-  <main>
-    <!-- Section 1: Hero Section with Scroll Animation -->
+  <main role="main">
+    <!-- Section 1: Hero Section with Direct Call to Action -->
     <section id="hero-section" class="content-section hero-section">
       <div class="section-container">
         <div class="hero-badge-container">
@@ -91,23 +91,23 @@
         </h1>
 
         <p class="hero-subtitle">
-          A modern, frontend-only daily task manager powered by Three.js WebGL. 
+          A high-performance, frontend-only daily task manager powered by Three.js WebGL. 
           Manage high-impact priorities, track real-time completion velocity, and persist your flow across sessions.
         </p>
 
         <div class="hero-actions">
           <a href="#tasks-section" class="cta-btn cta-btn-primary" id="cta-start-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-            Add New Task
+            Manage Tasks
           </a>
           <a href="#matrix-section" class="cta-btn cta-btn-secondary" id="cta-explore-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
-            View 3D Matrix
+            Explore 3D Worlds
           </a>
         </div>
 
-        <a href="#matrix-section" class="scroll-indicator" id="scroll-prompt-btn" aria-label="Scroll down to 3D matrix">
-          <span>Scroll to enter matrix</span>
+        <a href="#tasks-section" class="scroll-indicator" id="scroll-prompt-btn" aria-label="Scroll down to task management console">
+          <span>Scroll to tasks</span>
           <div class="mouse-scroll">
             <div class="mouse-wheel"></div>
           </div>
@@ -115,110 +115,11 @@
       </div>
     </section>
 
-    <!-- Section 2: 3D Interactive Task Matrix -->
-    <section id="matrix-section" class="content-section matrix-section">
+    <!-- Section 2: Task Management Console (Immediate Priority Front and Center) -->
+    <section id="tasks-section" class="content-section" role="region" aria-label="Task Management Console">
       <div class="section-container">
         <div class="section-header">
-          <span class="section-tag">Cosmic Architecture · Solar System</span>
-          <h2 class="section-title">
-            <span style="color: #fbbf24; display: block; font-size: 0.72em; letter-spacing: 0.12em; text-shadow: 0 0 24px rgba(251, 191, 36, 0.45); margin-bottom: 8px;">
-              ORBITAL PERIOD OF DIFFERENT WORLDS
-            </span>
-            Planetary Orbital Matrix
-          </h2>
-          <p class="section-desc">
-            Explore authentic planetary worlds revolving around the central Sun. Click any world below to fly the cosmic camera directly to its orbit.
-          </p>
-        </div>
-
-        <div class="matrix-viewport-card">
-          <!-- Worlds Telemetry & Quick Navigation (matching user reference) -->
-          <div class="worlds-nav-strip">
-            <button type="button" class="world-nav-pill" data-planet="MERCURY">
-              <span class="world-dot" style="background:#9ca3af;"></span>
-              <span class="world-name">MERCURY</span>
-              <span class="world-period">88 DAYS</span>
-            </button>
-            <button type="button" class="world-nav-pill" data-planet="VENUS">
-              <span class="world-dot" style="background:#e3bb76;"></span>
-              <span class="world-name">VENUS</span>
-              <span class="world-period">225 DAYS</span>
-            </button>
-            <button type="button" class="world-nav-pill" data-planet="EARTH">
-              <span class="world-dot" style="background:#2b82c9;"></span>
-              <span class="world-name">EARTH</span>
-              <span class="world-period">365 DAYS</span>
-            </button>
-            <button type="button" class="world-nav-pill" data-planet="MARS">
-              <span class="world-dot" style="background:#c1440e;"></span>
-              <span class="world-name">MARS</span>
-              <span class="world-period">687 DAYS</span>
-            </button>
-            <button type="button" class="world-nav-pill" data-planet="JUPITER">
-              <span class="world-dot" style="background:#d8ca9d;"></span>
-              <span class="world-name">JUPITER</span>
-              <span class="world-period">12 YEARS</span>
-            </button>
-            <button type="button" class="world-nav-pill" data-planet="SATURN">
-              <span class="world-dot" style="background:#e2bf7d;"></span>
-              <span class="world-name">SATURN</span>
-              <span class="world-period">30 YEARS</span>
-            </button>
-            <button type="button" class="world-nav-pill" data-planet="URANUS">
-              <span class="world-dot" style="background:#70d6ff;"></span>
-              <span class="world-name">URANUS</span>
-              <span class="world-period">84 YEARS</span>
-            </button>
-            <button type="button" class="world-nav-pill" data-planet="NEPTUNE">
-              <span class="world-dot" style="background:#274687;"></span>
-              <span class="world-name">NEPTUNE</span>
-              <span class="world-period">165 YEARS</span>
-            </button>
-            <button type="button" class="world-nav-pill" data-planet="PLUTO">
-              <span class="world-dot" style="background:#968570;"></span>
-              <span class="world-name">PLUTO</span>
-              <span class="world-period">248 YEARS</span>
-            </button>
-          </div>
-
-          <div class="matrix-hud-bar">
-            <div class="matrix-hud-info">
-              <span id="matrix-crystal-count" class="matrix-chip">4 Satellites In Orbit</span>
-              <span class="matrix-chip" style="background: rgba(16, 185, 129, 0.1); color: var(--accent-emerald); border-color: rgba(16, 185, 129, 0.3);">
-                Planet WebGL 60 FPS
-              </span>
-            </div>
-            <div class="matrix-controls-bar">
-              <button class="hud-btn" id="btn-wireframe" title="Toggle 3D Wireframe Geometry">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
-                Wireframe
-              </button>
-              <button class="hud-btn" id="btn-speed" title="Increase Planetary Orbit Speed">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-                Orbit Speed: 1.0x
-              </button>
-              <button class="hud-btn" id="btn-reset-cam" title="Reset 3D Cosmic Camera">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
-                Reset Camera
-              </button>
-            </div>
-          </div>
-
-          <div class="matrix-legend">
-            <div class="legend-item"><span class="legend-dot" style="background: #ff4757; box-shadow: 0 0 8px #ff4757;"></span> High Priority Orbit</div>
-            <div class="legend-item"><span class="legend-dot cyan"></span> Medium Priority Orbit</div>
-            <div class="legend-item"><span class="legend-dot" style="background: #2ed573; box-shadow: 0 0 8px #2ed573;"></span> Low Priority Orbit</div>
-            <div class="legend-item"><span class="legend-dot emerald"></span> Completed Orbit</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Section 3: Task Management Console -->
-    <section id="tasks-section" class="content-section">
-      <div class="section-container">
-        <div class="section-header">
-          <span class="section-tag">FocusList Core</span>
+          <span class="section-tag">FocusList Core Console</span>
           <h2 class="section-title">Task Management Console</h2>
           <p class="section-desc">
             Create, edit, prioritize, search, and complete your daily tasks with instantaneous responsiveness and Local Storage persistence.
@@ -230,15 +131,24 @@
           <div class="todo-main-column">
             <!-- 1. Task Creation Card -->
             <div class="task-create-card">
-              <form id="task-form">
+              <form id="task-form" aria-label="Create Task Form">
                 <div class="task-input-primary">
-                  <input type="text" id="task-input" class="todo-text-input" placeholder="Enter a new task title..." autocomplete="off" required>
+                  <label for="task-input" class="sr-only">Task Title</label>
+                  <input type="text" 
+                         id="task-input" 
+                         class="todo-text-input" 
+                         placeholder="Enter a new task title..." 
+                         autocomplete="off" 
+                         required 
+                         data-testid="task-input"
+                         data-testid-alt="new-todo"
+                         aria-label="Task title input">
                 </div>
                 <div class="task-options-row">
                   <!-- Priority Selector -->
                   <div style="display: flex; flex-direction: column; gap: 4px;">
                     <label for="task-priority" style="font-size: 0.72rem; color: #94a3b8; font-weight: 600;">Priority</label>
-                    <select id="task-priority" class="custom-select" title="Task Priority">
+                    <select id="task-priority" class="custom-select" title="Task Priority" data-testid="task-priority" aria-label="Select task priority">
                       <option value="high">🔴 High Priority</option>
                       <option value="medium" selected>🔵 Medium Priority</option>
                       <option value="low">🟢 Low Priority</option>
@@ -248,13 +158,13 @@
                   <!-- Due Date Picker -->
                   <div style="display: flex; flex-direction: column; gap: 4px;">
                     <label for="task-due-date" style="font-size: 0.72rem; color: #94a3b8; font-weight: 600;">Due Date</label>
-                    <input type="date" id="task-due-date" class="custom-date-input" title="Due Date">
+                    <input type="date" id="task-due-date" class="custom-date-input" title="Due Date" aria-label="Select task due date">
                   </div>
 
                   <!-- Submit Button -->
                   <div style="display: flex; align-items: flex-end;">
-                    <button type="submit" class="btn-add-task" id="add-task-btn" style="width: 100%; justify-content: center; height: 42px;">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    <button type="submit" class="btn-add-task" id="add-task-btn" data-testid="add-task-btn" style="width: 100%; justify-content: center; height: 42px;" aria-label="Add task to list">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                       Add Task
                     </button>
                   </div>
@@ -264,16 +174,16 @@
 
             <!-- 4. Search and Filtering Bar -->
             <div class="filter-bar-card">
-              <div class="filter-pills">
-                <button class="filter-pill active" id="filter-all" data-filter="all">All</button>
-                <button class="filter-pill" id="filter-active" data-filter="active">Active</button>
-                <button class="filter-pill" id="filter-completed" data-filter="completed">Completed</button>
+              <div class="filter-pills" role="tablist" aria-label="Filter tasks by status">
+                <button type="button" class="filter-pill active" id="filter-all" data-filter="all" data-testid="filter-all" role="tab" aria-selected="true">All</button>
+                <button type="button" class="filter-pill" id="filter-active" data-filter="active" data-testid="filter-active" role="tab" aria-selected="false">Active</button>
+                <button type="button" class="filter-pill" id="filter-completed" data-filter="completed" data-testid="filter-completed" role="tab" aria-selected="false">Completed</button>
               </div>
 
               <!-- Priority Filter -->
               <div style="display: flex; align-items: center; gap: 0.5rem;">
                 <label for="filter-priority" style="font-size: 0.78rem; color: #94a3b8;">Priority:</label>
-                <select id="filter-priority" class="custom-select" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" title="Filter by priority">
+                <select id="filter-priority" class="custom-select" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;" title="Filter by priority" data-testid="filter-priority" aria-label="Filter tasks by priority">
                   <option value="all">All Priorities</option>
                   <option value="high">High</option>
                   <option value="medium">Medium</option>
@@ -283,26 +193,27 @@
 
               <!-- Search by title -->
               <div class="search-wrapper">
-                <svg class="search-icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-                <input type="text" id="search-input" class="search-input" placeholder="Search tasks by title...">
+                <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <label for="search-input" class="sr-only">Search tasks by title</label>
+                <input type="text" id="search-input" class="search-input" placeholder="Search tasks by title..." data-testid="search-input" aria-label="Search tasks by title">
               </div>
             </div>
 
             <!-- 2. Task List (Managed dynamically) -->
-            <div id="task-list" class="task-list">
+            <div id="task-list" class="task-list" data-testid="task-list" role="list" aria-live="polite" aria-label="Tasks List">
               <!-- Rendered via js/main.js -->
             </div>
 
             <!-- Empty State Fallback -->
-            <div id="empty-state" class="empty-state" style="display: none;">
-              <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+            <div id="empty-state" class="empty-state" style="display: none;" role="status">
+              <svg class="empty-state-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
               <h3>No tasks found</h3>
               <p>Try clearing your search query or switching filters.</p>
             </div>
           </div>
 
           <!-- Right Column: 5. Task Statistics Sidebar -->
-          <aside class="productivity-sidebar">
+          <aside class="productivity-sidebar" role="region" aria-label="Task Statistics">
             <div class="sidebar-card">
               <h3 class="sidebar-title">
                 Task Statistics
@@ -310,7 +221,7 @@
               </h3>
 
               <!-- Radial Progress Ring -->
-              <div class="progress-ring-container">
+              <div class="progress-ring-container" aria-hidden="true">
                 <svg class="progress-ring" width="130" height="130">
                   <circle class="progress-ring-circle-bg" stroke-width="8" fill="transparent" r="52" cx="65" cy="65" />
                   <circle id="progress-circle" class="progress-ring-circle" stroke-width="8" fill="transparent" r="52" cx="65" cy="65" />
@@ -322,17 +233,17 @@
               </div>
 
               <!-- Exact Required FAIE Statistics Grid -->
-              <div class="stats-grid">
+              <div class="stats-grid" role="region" aria-label="Statistics Summary">
                 <div class="stat-item">
-                  <div id="total-tasks" class="stat-num">0</div>
+                  <div id="total-tasks" class="stat-num" data-testid="total-tasks">0</div>
                   <div class="stat-label">Total Tasks</div>
                 </div>
                 <div class="stat-item">
-                  <div id="completed-tasks" class="stat-num" style="color: var(--accent-emerald);">0</div>
+                  <div id="completed-tasks" class="stat-num" data-testid="completed-tasks" style="color: var(--accent-emerald);">0</div>
                   <div class="stat-label">Completed Tasks</div>
                 </div>
                 <div class="stat-item">
-                  <div id="pending-tasks" class="stat-num" style="color: var(--accent-cyan);">0</div>
+                  <div id="pending-tasks" class="stat-num" data-testid="pending-tasks" style="color: var(--accent-cyan);">0</div>
                   <div class="stat-label">Pending Tasks</div>
                 </div>
                 <div class="stat-item">
@@ -385,17 +296,17 @@
                 All tasks are automatically persisted into your browser's Local Storage. Refreshing the page preserves your full task history.
               </p>
               <div class="data-controls">
-                <button id="btn-export" class="data-btn">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <button type="button" id="btn-export" class="data-btn" aria-label="Export tasks as JSON file">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                   Export Tasks (JSON)
                 </button>
-                <button id="btn-import" class="data-btn">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <button type="button" id="btn-import" class="data-btn" aria-label="Import tasks from JSON file">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
                   Import Tasks (JSON)
                 </button>
-                <input type="file" id="file-import-input" accept=".json" style="display: none;">
-                <button id="btn-clear-completed" class="data-btn" style="color: var(--accent-rose);">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
+                <input type="file" id="file-import-input" accept=".json" style="display: none;" aria-label="Upload JSON task file">
+                <button type="button" id="btn-clear-completed" class="data-btn" style="color: var(--accent-rose);" aria-label="Clear all completed tasks">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path></svg>
                   Clear Completed Tasks
                 </button>
               </div>
@@ -405,27 +316,125 @@
       </div>
     </section>
 
+    <!-- Section 3: 3D Interactive Solar Matrix (Reference-Aligned) -->
+    <section id="matrix-section" class="content-section matrix-section" role="region" aria-label="Planetary Orbital Matrix">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-tag">Cosmic Architecture · Solar System</span>
+          <h2 class="section-title">
+            <span style="color: #fbbf24; display: block; font-size: 0.72em; letter-spacing: 0.12em; text-shadow: 0 0 24px rgba(251, 191, 36, 0.45); margin-bottom: 8px;">
+              ORBITAL PERIOD OF DIFFERENT WORLDS
+            </span>
+            Planetary Orbital Matrix
+          </h2>
+          <p class="section-desc">
+            Explore authentic planetary worlds revolving around the central Sun. Click any world below to fly the cosmic camera directly to its orbit.
+          </p>
+        </div>
+
+        <div class="matrix-viewport-card">
+          <!-- Worlds Telemetry & Quick Navigation (matching user reference) -->
+          <div class="worlds-nav-strip" role="toolbar" aria-label="World Orbital Navigation">
+            <button type="button" class="world-nav-pill" data-planet="MERCURY" aria-label="Focus on Mercury: 88 days orbit">
+              <span class="world-dot" style="background:#9ca3af;" aria-hidden="true"></span>
+              <span class="world-name">MERCURY</span>
+              <span class="world-period">88 DAYS</span>
+            </button>
+            <button type="button" class="world-nav-pill" data-planet="VENUS" aria-label="Focus on Venus: 225 days orbit">
+              <span class="world-dot" style="background:#e3bb76;" aria-hidden="true"></span>
+              <span class="world-name">VENUS</span>
+              <span class="world-period">225 DAYS</span>
+            </button>
+            <button type="button" class="world-nav-pill" data-planet="EARTH" aria-label="Focus on Earth: 365 days orbit">
+              <span class="world-dot" style="background:#2b82c9;" aria-hidden="true"></span>
+              <span class="world-name">EARTH</span>
+              <span class="world-period">365 DAYS</span>
+            </button>
+            <button type="button" class="world-nav-pill" data-planet="MARS" aria-label="Focus on Mars: 687 days orbit">
+              <span class="world-dot" style="background:#c1440e;" aria-hidden="true"></span>
+              <span class="world-name">MARS</span>
+              <span class="world-period">687 DAYS</span>
+            </button>
+            <button type="button" class="world-nav-pill" data-planet="JUPITER" aria-label="Focus on Jupiter: 12 years orbit">
+              <span class="world-dot" style="background:#d8ca9d;" aria-hidden="true"></span>
+              <span class="world-name">JUPITER</span>
+              <span class="world-period">12 YEARS</span>
+            </button>
+            <button type="button" class="world-nav-pill" data-planet="SATURN" aria-label="Focus on Saturn: 30 years orbit">
+              <span class="world-dot" style="background:#e2bf7d;" aria-hidden="true"></span>
+              <span class="world-name">SATURN</span>
+              <span class="world-period">30 YEARS</span>
+            </button>
+            <button type="button" class="world-nav-pill" data-planet="URANUS" aria-label="Focus on Uranus: 84 years orbit">
+              <span class="world-dot" style="background:#70d6ff;" aria-hidden="true"></span>
+              <span class="world-name">URANUS</span>
+              <span class="world-period">84 YEARS</span>
+            </button>
+            <button type="button" class="world-nav-pill" data-planet="NEPTUNE" aria-label="Focus on Neptune: 165 years orbit">
+              <span class="world-dot" style="background:#274687;" aria-hidden="true"></span>
+              <span class="world-name">NEPTUNE</span>
+              <span class="world-period">165 YEARS</span>
+            </button>
+            <button type="button" class="world-nav-pill" data-planet="PLUTO" aria-label="Focus on Pluto: 248 years orbit">
+              <span class="world-dot" style="background:#968570;" aria-hidden="true"></span>
+              <span class="world-name">PLUTO</span>
+              <span class="world-period">248 YEARS</span>
+            </button>
+          </div>
+
+          <div class="matrix-hud-bar">
+            <div class="matrix-hud-info">
+              <span id="matrix-crystal-count" class="matrix-chip">4 Satellites In Orbit</span>
+              <span class="matrix-chip" style="background: rgba(16, 185, 129, 0.1); color: var(--accent-emerald); border-color: rgba(16, 185, 129, 0.3);">
+                Planet WebGL 60 FPS
+              </span>
+            </div>
+            <div class="matrix-controls-bar">
+              <button type="button" class="hud-btn" id="btn-wireframe" title="Toggle 3D Wireframe Geometry" aria-label="Toggle Wireframe">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                Wireframe
+              </button>
+              <button type="button" class="hud-btn" id="btn-speed" title="Increase Planetary Orbit Speed" aria-label="Increase Orbit Speed">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                Orbit Speed: 1.0x
+              </button>
+              <button type="button" class="hud-btn" id="btn-reset-cam" title="Reset 3D Cosmic Camera" aria-label="Reset Camera View">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                Reset Camera
+              </button>
+            </div>
+          </div>
+
+          <div class="matrix-legend">
+            <div class="legend-item"><span class="legend-dot" style="background: #ff4757; box-shadow: 0 0 8px #ff4757;" aria-hidden="true"></span> High Priority Orbit</div>
+            <div class="legend-item"><span class="legend-dot cyan" aria-hidden="true"></span> Medium Priority Orbit</div>
+            <div class="legend-item"><span class="legend-dot" style="background: #2ed573; box-shadow: 0 0 8px #2ed573;" aria-hidden="true"></span> Low Priority Orbit</div>
+            <div class="legend-item"><span class="legend-dot emerald" aria-hidden="true"></span> Completed Orbit</div>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <!-- Edit Task Modal Dialog -->
-  <div id="edit-modal" class="modal-overlay" style="display: none;">
+  <!-- Edit Task Modal Dialog (WCAG Accessible) -->
+  <div id="edit-modal" class="modal-overlay" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="modal-title-heading" data-testid="edit-modal">
     <div class="modal-card">
       <div class="modal-header">
-        <h3 class="modal-title">Edit Task</h3>
+        <h3 class="modal-title" id="modal-title-heading">Edit Task</h3>
         <button type="button" id="btn-close-modal" class="icon-btn" title="Close dialog" aria-label="Close edit dialog">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
-      <form id="edit-task-form">
+      <form id="edit-task-form" aria-label="Edit task details form">
         <input type="hidden" id="edit-task-id">
         <div class="modal-body">
           <div class="form-group">
             <label for="edit-task-title" class="form-label">Task Title</label>
-            <input type="text" id="edit-task-title" class="todo-text-input" required>
+            <input type="text" id="edit-task-title" class="todo-text-input" required data-testid="edit-task-input" aria-label="Edit task title">
           </div>
           <div class="form-group">
             <label for="edit-task-priority" class="form-label">Priority</label>
-            <select id="edit-task-priority" class="custom-select">
+            <select id="edit-task-priority" class="custom-select" aria-label="Edit task priority">
               <option value="high">🔴 High Priority</option>
               <option value="medium">🔵 Medium Priority</option>
               <option value="low">🟢 Low Priority</option>
@@ -433,16 +442,16 @@
           </div>
         </div>
         <div class="modal-actions">
-          <button type="button" id="btn-cancel-edit" class="btn-cancel">Cancel</button>
-          <button type="submit" class="btn-save">Save Changes</button>
+          <button type="button" id="btn-cancel-edit" class="btn-cancel" aria-label="Cancel editing">Cancel</button>
+          <button type="submit" class="btn-save" data-testid="save-edit-btn" aria-label="Save changes to task">Save Changes</button>
         </div>
       </form>
     </div>
   </div>
 
   <!-- Floating Audio Status Pill -->
-  <div id="audio-pill" class="floating-audio-pill" title="Click to toggle procedural ambient synthesizer">
-    <div class="audio-soundwave">
+  <div id="audio-pill" class="floating-audio-pill" title="Click to toggle procedural ambient synthesizer" role="button" aria-label="Toggle procedural ambient audio" tabindex="0">
+    <div class="audio-soundwave" aria-hidden="true">
       <div class="wave-bar"></div>
       <div class="wave-bar"></div>
       <div class="wave-bar"></div>
@@ -452,7 +461,7 @@
   </div>
 
   <!-- Footer -->
-  <footer class="app-footer">
+  <footer class="app-footer" role="contentinfo">
     <div class="footer-content">
       <div class="brand-logo">
         <span class="brand-title">FocusList<span style="font-weight:400; opacity:0.8;"> 3D</span></span>
@@ -463,11 +472,11 @@
     </div>
   </footer>
 
-  <!-- Scripts: Three.js CDN first, then Modular Application Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="js/audio.js"></script>
-  <script src="js/todo.js"></script>
-  <script src="js/three-app.js"></script>
-  <script src="js/main.js"></script>
+  <!-- Scripts: Non-blocking deferred loading for maximum performance -->
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script defer src="js/audio.js"></script>
+  <script defer src="js/todo.js"></script>
+  <script defer src="js/three-app.js"></script>
+  <script defer src="js/main.js"></script>
 </body>
 </html>

@@ -41,18 +41,16 @@ class World3D {
     this.rotationSpeed = 1.0;
     this.isWireframe = false;
 
-    // Cinematic Camera Waypoints through the Solar System (matching reference view)
+    // Cinematic Camera Waypoints through the Solar System (Hero -> Tasks -> Matrix -> Deep Space)
     this.cameraKeyframes = [
       // 0. Hero: Cinematic high-angle perspective of Sun & elliptical orbits matching reference
       { pos: new THREE.Vector3(0, 9.5, 20.5), target: new THREE.Vector3(0, -0.6, 0) },
-      // 1. 3D Matrix: Inclined fly-by showcasing planetary orbits
-      { pos: new THREE.Vector3(3.5, 7.0, 15.5), target: new THREE.Vector3(0, 0, 0) },
-      // 2. Tasks Console: Lateral framing with planets revolving in space on the right
+      // 1. Tasks Console: Lateral framing with planets revolving in space on the right
       { pos: new THREE.Vector3(-9.5, 4.5, 14.5), target: new THREE.Vector3(2.5, 0, 0) },
-      // 3. Statistics: Top-down orbital overview of all concentric planetary orbits
-      { pos: new THREE.Vector3(0, 22.0, 6.0), target: new THREE.Vector3(0, 0, 0) },
-      // 4. Rules & Footer: Deep space wide shot taking in the whole universe
-      { pos: new THREE.Vector3(0, 9.0, 25.0), target: new THREE.Vector3(0, 0, 0) }
+      // 2. 3D Matrix: Close fly-by showcasing planetary orbits and worlds strip
+      { pos: new THREE.Vector3(3.5, 7.0, 15.5), target: new THREE.Vector3(0, 0, 0) },
+      // 3. Footer & Overview: Deep space wide shot taking in the whole universe
+      { pos: new THREE.Vector3(0, 11.0, 24.0), target: new THREE.Vector3(0, 0, 0) }
     ];
 
     this.currentCameraPos = new THREE.Vector3().copy(this.cameraKeyframes[0].pos);
@@ -72,7 +70,7 @@ class World3D {
     this.camera.position.copy(this.currentCameraPos);
     this.camera.lookAt(this.currentCameraTarget);
 
-    // 3. Renderer Setup
+    // 3. Renderer Setup (Performance Optimized for 60 FPS)
     this.renderer = new THREE.WebGLRenderer({
       canvas: this.canvas,
       antialias: true,
@@ -80,7 +78,7 @@ class World3D {
       powerPreference: 'high-performance'
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.25;
 

@@ -6,6 +6,22 @@
 
 'use strict';
 
+function safePlaySound(method) {
+  if (typeof window !== 'undefined' && window.soundEngine && typeof window.soundEngine[method] === 'function') {
+    try {
+      window.soundEngine[method]();
+    } catch (e) {
+      // ignore
+    }
+  }
+}
+
+function safeDispatch(name, detail) {
+  if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+    window.dispatchEvent(new CustomEvent(name, { detail }));
+  }
+}
+
 class TodoManager {
   constructor() {
     this.storageKey = 'focuslist_tasks_v1';
@@ -61,39 +77,47 @@ class TodoManager {
   }
 
   init() {
-    const saved = localStorage.getItem(this.storageKey);
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          this.tasks = parsed;
-        } else {
+    if (typeof localStorage !== 'undefined') {
+      const saved = localStorage.getItem(this.storageKey);
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            this.tasks = parsed;
+          } else {
+            this.tasks = [...this.defaultTasks];
+          }
+        } catch (e) {
           this.tasks = [...this.defaultTasks];
         }
-      } catch (e) {
+      } else {
         this.tasks = [...this.defaultTasks];
+        this.save();
       }
     } else {
       this.tasks = [...this.defaultTasks];
-      this.save();
     }
   }
 
   save() {
-    localStorage.setItem(this.storageKey, JSON.stringify(this.tasks));
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.tasks));
+    }
     this.notify();
   }
 
   notify() {
     const stats = this.getStats();
     const filteredTasks = this.getFilteredTasks();
-    window.dispatchEvent(new CustomEvent('tasksUpdated', {
-      detail: {
-        tasks: this.tasks,
-        filteredTasks: filteredTasks,
-        stats: stats
-      }
-    }));
+    if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+      window.dispatchEvent(new CustomEvent('tasksUpdated', {
+        detail: {
+          tasks: this.tasks,
+          filteredTasks: filteredTasks,
+          stats: stats
+        }
+      }));
+    }
   }
 
   // 1. Task Creation
@@ -113,7 +137,7 @@ class TodoManager {
 
     this.tasks.unshift(newTask);
     this.save();
-    if (window.soundEngine) window.soundEngine.playClick();
+    safePlaySound('playClick');
     return newTask;
   }
 
@@ -127,34 +151,41 @@ class TodoManager {
     this.save();
 
     if (task.completed) {
-      if (window.soundEngine) window.soundEngine.playTaskComplete();
-      window.dispatchEvent(new CustomEvent('taskCompletedCelebration', { detail: { task } }));
+      safePlaySound('playTaskComplete');
+      safeDispatch('taskCompletedCelebration', { task });
     } else {
-      if (window.soundEngine) window.soundEngine.playClick();
+      safePlaySound('playClick');
     }
     return task;
   }
 
-  // 3. Edit existing task
-  editTask(id, updatedData) {
+  // 3. Edit existing task (supports object or (id, title, priority))
+  editTask(id, updatedData, priorityArg) {
     const task = this.tasks.find(t => t.id === id);
     if (!task) return null;
 
-    if (updatedData.title !== undefined && updatedData.title.trim()) {
-      task.title = updatedData.title.trim();
-    }
-    if (updatedData.priority !== undefined) {
-      task.priority = updatedData.priority.toLowerCase();
-    }
-    if (updatedData.category !== undefined) {
-      task.category = updatedData.category;
-    }
-    if (updatedData.dueDate !== undefined) {
-      task.dueDate = updatedData.dueDate;
+    if (typeof updatedData === 'string') {
+      task.title = updatedData.trim();
+      if (priorityArg) {
+        task.priority = priorityArg.toLowerCase();
+      }
+    } else if (updatedData && typeof updatedData === 'object') {
+      if (updatedData.title !== undefined && updatedData.title.trim()) {
+        task.title = updatedData.title.trim();
+      }
+      if (updatedData.priority !== undefined) {
+        task.priority = updatedData.priority.toLowerCase();
+      }
+      if (updatedData.category !== undefined) {
+        task.category = updatedData.category;
+      }
+      if (updatedData.dueDate !== undefined) {
+        task.dueDate = updatedData.dueDate;
+      }
     }
 
     this.save();
-    if (window.soundEngine) window.soundEngine.playClick();
+    safePlaySound('playClick');
     return task;
   }
 
@@ -164,7 +195,7 @@ class TodoManager {
     this.tasks = this.tasks.filter(t => t.id !== id);
     if (this.tasks.length !== initialLen) {
       this.save();
-      if (window.soundEngine) window.soundEngine.playTaskDelete();
+      safePlaySound('playTaskDelete');
       return true;
     }
     return false;
@@ -246,7 +277,7 @@ class TodoManager {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    if (window.soundEngine) window.soundEngine.playClick();
+    safePlaySound('playClick');
   }
 
   importData(jsonString) {
@@ -255,7 +286,7 @@ class TodoManager {
       if (Array.isArray(parsed)) {
         this.tasks = parsed;
         this.save();
-        if (window.soundEngine) window.soundEngine.playTaskComplete();
+        safePlaySound('playTaskComplete');
         return true;
       }
     } catch (e) {
@@ -265,4 +296,10 @@ class TodoManager {
   }
 }
 
-window.todoManager = new TodoManager();
+if (typeof window !== 'undefined') {
+  window.todoManager = new TodoManager();
+}
+
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = { TodoManager };
+}

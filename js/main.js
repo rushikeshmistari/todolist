@@ -80,20 +80,24 @@ document.addEventListener('DOMContentLoaded', () => {
       const priorityClass = `priority-${task.priority}`;
 
       return `
-        <article class="task-item ${completedClass} ${priorityClass}" data-task-id="${task.id}" id="task-${task.id}">
+        <article class="task-item ${completedClass} ${priorityClass}" data-task-id="${task.id}" id="task-${task.id}" data-testid="task-item">
           <div class="task-left">
-            <button type="button" 
-                    class="custom-checkbox ${isChecked ? 'checked' : ''}" 
-                    data-action="toggle" 
-                    role="checkbox" 
-                    aria-checked="${isChecked}" 
-                    aria-label="Mark task '${escapeHTML(task.title)}' as ${isChecked ? 'active' : 'completed'}">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
-            </button>
+            <label class="custom-checkbox-wrapper" for="check-${task.id}" title="Toggle task completion">
+              <input type="checkbox" 
+                     id="check-${task.id}" 
+                     class="task-checkbox sr-only" 
+                     data-action="toggle" 
+                     data-testid="task-checkbox"
+                     ${isChecked ? 'checked' : ''} 
+                     aria-label="Mark task '${escapeHTML(task.title)}' as ${isChecked ? 'active' : 'completed'}">
+              <span class="custom-checkbox ${isChecked ? 'checked' : ''}" data-action="toggle" aria-hidden="true">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </span>
+            </label>
             <div class="task-details">
-              <span class="task-title ${completedClass}">${escapeHTML(task.title)}</span>
+              <span class="task-title ${completedClass}" data-testid="task-title" title="Double click to edit">${escapeHTML(task.title)}</span>
               <div class="task-meta">
-                <span class="priority-badge ${task.priority}">
+                <span class="priority-badge ${task.priority}" data-testid="task-priority-badge">
                   ● ${capitalize(task.priority)} Priority
                 </span>
                 ${task.dueDate ? `
@@ -107,15 +111,15 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           <div class="task-actions">
             <!-- Edit Button -->
-            <button type="button" class="icon-btn btn-edit" data-action="edit" title="Edit Task" aria-label="Edit task '${escapeHTML(task.title)}'">
+            <button type="button" class="icon-btn btn-edit" data-action="edit" data-testid="edit-task-btn" title="Edit Task" aria-label="Edit task '${escapeHTML(task.title)}'">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
             </button>
             <!-- 3D Locate Button -->
-            <button type="button" class="icon-btn btn-3d-focus" data-action="focus-3d" title="Locate in 3D Matrix" aria-label="Locate task in 3D space">
+            <button type="button" class="icon-btn btn-3d-focus" data-action="focus-3d" data-testid="locate-task-btn" title="Locate in 3D Matrix" aria-label="Locate task in 3D space">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
             </button>
             <!-- Delete Button -->
-            <button type="button" class="icon-btn btn-delete" data-action="delete" title="Delete Task" aria-label="Delete task '${escapeHTML(task.title)}'">
+            <button type="button" class="icon-btn btn-delete" data-action="delete" data-testid="delete-task-btn" title="Delete Task" aria-label="Delete task '${escapeHTML(task.title)}'">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
             </button>
           </div>
@@ -128,6 +132,27 @@ document.addEventListener('DOMContentLoaded', () => {
    * Event Delegation for Task List Actions (No inline onclick handlers)
    */
   if (taskList) {
+    // Native Checkbox Change Support (for automated testing frameworks & accessibility)
+    taskList.addEventListener('change', (e) => {
+      const checkbox = e.target.closest('.task-checkbox');
+      if (checkbox) {
+        const item = checkbox.closest('.task-item');
+        if (item && item.dataset.taskId) {
+          window.todoManager.toggleTask(item.dataset.taskId);
+        }
+      }
+    });
+
+    // Double-click inline edit trigger
+    taskList.addEventListener('dblclick', (e) => {
+      const titleElem = e.target.closest('.task-title');
+      if (titleElem) {
+        const item = titleElem.closest('.task-item');
+        if (item && item.dataset.taskId) {
+          openEditModal(item.dataset.taskId);
+        }
+      }
+    });
     taskList.addEventListener('click', (e) => {
       const toggleBtn = e.target.closest('[data-action="toggle"]');
       if (toggleBtn) {

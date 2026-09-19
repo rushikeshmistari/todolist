@@ -1411,3 +1411,191 @@ main {
     transform: translateY(0);
   }
 }
+
+/* ==========================================================================
+   ♿ ACCESSIBILITY UTILITIES & FOCUS MANAGEMENT (WCAG 2.1 AA)
+   ========================================================================== */
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent-cyan) !important;
+  outline-offset: 3px !important;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent-cyan) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.6) !important;
+}
+
+/* ==========================================================================
+   📱 COMPREHENSIVE RESPONSIVE DESIGN SYSTEM (FQE AUDITED)
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+  .section-container {
+    padding: 0 1.5rem;
+  }
+
+  .todo-layout-grid {
+    grid-template-columns: 1fr 340px;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .todo-layout-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .productivity-sidebar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .hud-nav-container {
+    gap: 1rem;
+  }
+
+  .nav-links {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .content-section {
+    padding: 5rem 1rem 3rem;
+    min-height: auto;
+  }
+
+  .hud-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .nav-links {
+    display: none;
+  }
+
+  .hero-title {
+    font-size: 2.2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .cta-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .matrix-hud-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .matrix-controls-bar {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .task-options-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .btn-add-task {
+    width: 100%;
+  }
+
+  .filter-bar-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-pills {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .search-wrapper {
+    width: 100%;
+    min-width: 100%;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .floating-audio-pill {
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 1.8rem;
+  }
+
+  .section-title {
+    font-size: 1.6rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .productivity-sidebar {
+    grid-template-columns: 1fr;
+  }
+
+  .task-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.8rem;
+  }
+
+  .task-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .world-nav-pill {
+    font-size: 0.62rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+/* Reduced Motion for Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

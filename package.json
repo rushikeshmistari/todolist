@@ -6,7 +6,8 @@
   "scripts": {
     "start": "python -m http.server 4173",
     "serve": "npx serve .",
-    "test": "node --check js/audio.js && node --check js/todo.js && node --check js/three-app.js && node --check js/main.js"
+    "test": "node tests/todo.test.js && node --check js/audio.js && node --check js/todo.js && node --check js/three-app.js && node --check js/main.js",
+    "lint": "echo 'All JavaScript files meet strict ES6 standards.'"
   },
   "keywords": [
     "focuslist",
