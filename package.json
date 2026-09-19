@@ -1,0 +1,24 @@
+{
+  "name": "focuslist-3d",
+  "version": "1.0.0",
+  "description": "FocusList 3D — An authoritative, 100% frontend-only task management application built for the WebRush FAIE Hackathon Benchmark.",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 4173",
+    "serve": "npx serve .",
+    "test": "node --check js/audio.js && node --check js/todo.js && node --check js/three-app.js && node --check js/main.js"
+  },
+  "keywords": [
+    "focuslist",
+    "todo",
+    "webrush",
+    "faie",
+    "hackathon",
+    "threejs",
+    "webgl",
+    "frontend-only",
+    "localstorage"
+  ],
+  "author": "WebRush Participant",
+  "license": "MIT"
+}
