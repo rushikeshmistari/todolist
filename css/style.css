@@ -1295,59 +1295,6 @@ main {
   color: #ffffff;
 }
 
-/* --- Hackathon Rules & Compliance Section --- */
-.rules-compliance-card {
-  background: var(--bg-glass-card);
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  border-radius: var(--radius-lg);
-  padding: 2.5rem;
-  backdrop-filter: blur(20px);
-  box-shadow: 0 0 35px rgba(16, 185, 129, 0.15);
-  margin-top: 3rem;
-}
-
-.rules-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.8rem;
-}
-
-.rule-box {
-  background: rgba(6, 8, 16, 0.6);
-  border: var(--border-glass);
-  border-radius: var(--radius-md);
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.rule-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-family: var(--font-display);
-  font-size: 0.72rem;
-  color: var(--accent-emerald);
-  font-weight: 700;
-}
-
-.rule-title {
-  font-family: var(--font-heading);
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #ffffff;
-}
-
-.rule-desc {
-  font-size: 0.84rem;
-  color: #94a3b8;
-  line-height: 1.5;
-}
-
 /* --- Audio Floating Controls --- */
 .floating-audio-pill {
   position: fixed;
