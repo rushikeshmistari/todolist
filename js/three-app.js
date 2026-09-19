@@ -1,9 +1,9 @@
 /**
- * FocusList 3D — Planet & Universe WebGL Three.js Engine
- * Features a realistic procedural planet with rotating clouds, atmospheric glow,
- * planetary rings, deep space nebula, 5,000+ stars, shooting meteors, and
- * orbital task satellites responding to scroll-driven camera journeys.
- * 100% Client-Side Procedural Generation | Zero External Image Dependencies
+ * FocusList 3D — Full Solar System & Deep Universe WebGL Engine
+ * Features the glowing Sun at the center and all actual planets revolving
+ * in their authentic colors, textures, and orbits (Mercury, Venus, Earth & Moon,
+ * Mars, Jupiter, Saturn & Rings, Uranus, Neptune, Pluto).
+ * 100% Procedural Generation | Zero External Images | Fully Interactive
  */
 
 'use strict';
@@ -16,23 +16,23 @@ class World3D {
     this.camera = null;
     this.renderer = null;
 
-    // Celestial Planet & Universe Groups
-    this.planetGroup = null;
-    this.planetMesh = null;
-    this.cloudsMesh = null;
-    this.atmosphereMesh = null;
-    this.ringsMesh = null;
+    // Solar System Components
+    this.solarSystemGroup = null;
+    this.sunMesh = null;
+    this.sunCorona = null;
+    this.planets = [];
+    this.orbitLines = [];
+    this.meteors = [];
     this.starfield = null;
     this.nebulaParticles = null;
-    this.meteors = [];
-    this.taskSatellitesGroup = null;
+    this.taskProbesGroup = null;
     this.particleBurst = [];
 
     // Interaction & Animation
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2(-1000, -1000);
     this.targetMouse = new THREE.Vector2(0, 0);
-    this.hoveredSatellite = null;
+    this.hoveredObject = null;
     this.clock = new THREE.Clock();
 
     // Scroll & Velocity Controls
@@ -41,18 +41,18 @@ class World3D {
     this.rotationSpeed = 1.0;
     this.isWireframe = false;
 
-    // Cinematic Camera Waypoints: Planetary Orbital Journey
+    // Cinematic Camera Waypoints through the Solar System (matching reference view)
     this.cameraKeyframes = [
-      // 0. Hero: High orbital vista overlooking the illuminated planet curvature & rings
-      { pos: new THREE.Vector3(0, 2.8, 11.5), target: new THREE.Vector3(0, -0.2, 0) },
-      // 1. 3D Matrix: Swooping into the orbital plane among the task satellites
-      { pos: new THREE.Vector3(0, 4.2, 7.8), target: new THREE.Vector3(0, 0.5, 0) },
-      // 2. Tasks Console: Lateral orbital vantage, framing planet on right side
-      { pos: new THREE.Vector3(-4.8, 1.6, 8.5), target: new THREE.Vector3(1.2, 0, 0) },
-      // 3. Task Statistics: High polar inclination looking down at the rings and aurora
-      { pos: new THREE.Vector3(2.5, 7.2, 7.0), target: new THREE.Vector3(0, -0.6, 0) },
-      // 4. Rules & Compliance: Deep cosmic vista, gazing at the planet amidst the starfield
-      { pos: new THREE.Vector3(0, 2.5, 14.5), target: new THREE.Vector3(0, 0, 0) }
+      // 0. Hero: Cinematic high-angle perspective of Sun & elliptical orbits matching reference
+      { pos: new THREE.Vector3(0, 9.5, 20.5), target: new THREE.Vector3(0, -0.6, 0) },
+      // 1. 3D Matrix: Inclined fly-by showcasing planetary orbits
+      { pos: new THREE.Vector3(3.5, 7.0, 15.5), target: new THREE.Vector3(0, 0, 0) },
+      // 2. Tasks Console: Lateral framing with planets revolving in space on the right
+      { pos: new THREE.Vector3(-9.5, 4.5, 14.5), target: new THREE.Vector3(2.5, 0, 0) },
+      // 3. Statistics: Top-down orbital overview of all concentric planetary orbits
+      { pos: new THREE.Vector3(0, 22.0, 6.0), target: new THREE.Vector3(0, 0, 0) },
+      // 4. Rules & Footer: Deep space wide shot taking in the whole universe
+      { pos: new THREE.Vector3(0, 9.0, 25.0), target: new THREE.Vector3(0, 0, 0) }
     ];
 
     this.currentCameraPos = new THREE.Vector3().copy(this.cameraKeyframes[0].pos);
@@ -64,11 +64,11 @@ class World3D {
   init() {
     // 1. Scene Setup
     this.scene = new THREE.Scene();
-    this.scene.fog = new THREE.FogExp2(0x04060c, 0.025);
+    this.scene.fog = new THREE.FogExp2(0x04060c, 0.015);
 
     // 2. Camera Setup
     const aspect = window.innerWidth / window.innerHeight;
-    this.camera = new THREE.PerspectiveCamera(48, aspect, 0.1, 1000);
+    this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000);
     this.camera.position.copy(this.currentCameraPos);
     this.camera.lookAt(this.currentCameraTarget);
 
@@ -82,24 +82,24 @@ class World3D {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    this.renderer.toneMappingExposure = 1.15;
+    this.renderer.toneMappingExposure = 1.25;
 
-    // 4. Lighting (Sunlight & Cosmic Ambient)
+    // 4. Lighting (Sunlight + Ambient Universe)
     this.setupLighting();
 
-    // 5. Construct Universe and Realistic Planet
+    // 5. Construct Solar System & Deep Universe
     this.createUniverse();
-    this.createPlanet();
+    this.createSolarSystem();
 
-    // 6. Orbital Task Satellites
-    this.taskSatellitesGroup = new THREE.Group();
-    this.scene.add(this.taskSatellitesGroup);
+    // 6. Interactive Task Orbit Probes
+    this.taskProbesGroup = new THREE.Group();
+    this.scene.add(this.taskProbesGroup);
 
     // 7. Bind Events & Render Loop
     this.bindEvents();
 
     if (window.todoManager) {
-      this.rebuildTaskSatellites(window.todoManager.tasks);
+      this.rebuildTaskProbes(window.todoManager.tasks);
     }
 
     this.animate = this.animate.bind(this);
@@ -107,259 +107,528 @@ class World3D {
   }
 
   setupLighting() {
-    // Soft deep-space ambient light
-    const ambient = new THREE.AmbientLight(0x1a2638, 0.9);
+    // Deep cosmic ambient illumination
+    const ambient = new THREE.AmbientLight(0x22334e, 1.2);
     this.scene.add(ambient);
 
-    // Primary Sun: Crisp directional sunlight casting realistic planet terminator
-    this.sunLight = new THREE.DirectionalLight(0xfffaed, 2.8);
-    this.sunLight.position.set(16, 12, 14);
+    // Sun Point Light: Blazing omnidirectional light illuminating all planets
+    this.sunLight = new THREE.PointLight(0xfff5e4, 3.8, 120, 0.5);
+    this.sunLight.position.set(0, 0, 0);
     this.scene.add(this.sunLight);
 
-    // Secondary Nebula Backlight: Ethereal cyan/purple rim reflection
-    this.rimLight = new THREE.DirectionalLight(0x00f2fe, 1.4);
-    this.rimLight.position.set(-14, -8, -12);
-    this.scene.add(this.rimLight);
+    // Directional backlight for volumetric rim highlights
+    const backRim = new THREE.DirectionalLight(0x00f2fe, 1.0);
+    backRim.position.set(-15, 12, -15);
+    this.scene.add(backRim);
   }
 
   /**
-   * Generates a procedural planet with surface texture, swirling clouds,
-   * atmospheric glow, and tilted rings.
+   * Constructs the authentic Solar System:
+   * Sun at center + Mercury, Venus, Earth & Moon, Mars, Jupiter,
+   * Saturn & Rings, Uranus, Neptune, Pluto revolving along visible orbits.
    */
-  createPlanet() {
-    this.planetGroup = new THREE.Group();
-    const planetRadius = 2.6;
+  createSolarSystem() {
+    this.solarSystemGroup = new THREE.Group();
+    this.scene.add(this.solarSystemGroup);
 
-    // 1. Procedural Surface Texture (Continents, Oceans, Mountain Relief)
-    const surfaceTexture = this.generatePlanetCanvasTexture();
-    const surfaceBump = this.generatePlanetBumpTexture();
-
-    const planetGeo = new THREE.SphereGeometry(planetRadius, 64, 64);
-    this.planetMat = new THREE.MeshStandardMaterial({
-      map: surfaceTexture,
-      bumpMap: surfaceBump,
-      bumpScale: 0.045,
-      roughness: 0.65,
-      metalness: 0.15
+    // --- 1. The Central Sun ---
+    const sunGeo = new THREE.SphereGeometry(2.1, 48, 48);
+    const sunTexture = this.generateSunTexture();
+    const sunMat = new THREE.MeshBasicMaterial({
+      map: sunTexture
     });
-    this.planetMesh = new THREE.Mesh(planetGeo, this.planetMat);
-    this.planetGroup.add(this.planetMesh);
+    this.sunMesh = new THREE.Mesh(sunGeo, sunMat);
+    this.solarSystemGroup.add(this.sunMesh);
 
-    // 2. Swirling Cloud Layer
-    const cloudsTexture = this.generateCloudsCanvasTexture();
-    const cloudsGeo = new THREE.SphereGeometry(planetRadius * 1.018, 64, 64);
-    this.cloudsMat = new THREE.MeshStandardMaterial({
-      map: cloudsTexture,
+    // Sun Glowing Corona Flare
+    const coronaGeo = new THREE.SphereGeometry(2.35, 32, 32);
+    const coronaMat = new THREE.MeshBasicMaterial({
+      color: 0xff6600,
       transparent: true,
-      opacity: 0.85,
-      blending: THREE.AdditiveBlending,
-      roughness: 1.0
-    });
-    this.cloudsMesh = new THREE.Mesh(cloudsGeo, this.cloudsMat);
-    this.planetGroup.add(this.cloudsMesh);
-
-    // 3. Atmospheric Halo Glow
-    const atmosphereGeo = new THREE.SphereGeometry(planetRadius * 1.05, 64, 64);
-    const atmosphereMat = new THREE.MeshBasicMaterial({
-      color: 0x00f2fe,
-      transparent: true,
-      opacity: 0.16,
+      opacity: 0.35,
       blending: THREE.AdditiveBlending,
       side: THREE.BackSide
     });
-    this.atmosphereMesh = new THREE.Mesh(atmosphereGeo, atmosphereMat);
-    this.planetGroup.add(this.atmosphereMesh);
+    this.sunCorona = new THREE.Mesh(coronaGeo, coronaMat);
+    this.solarSystemGroup.add(this.sunCorona);
 
-    // 4. Planetary Rings (Tilted celestial ring system)
-    const ringGeo = new THREE.RingGeometry(3.5, 5.6, 96);
-    // Rotate ring geometry to lie flat horizontally before tilt
-    ringGeo.rotateX(Math.PI / 2);
+    // --- 2. Planetary Worlds Definition (Authentic Sizes & Colors) ---
+    const planetSpecs = [
+      {
+        name: 'MERCURY',
+        period: '88 DAYS',
+        radius: 0.36,
+        dist: 3.6,
+        speed: 1.6,
+        colorHex: 0x9ca3af,
+        generator: () => this.generateMercuryTexture()
+      },
+      {
+        name: 'VENUS',
+        period: '225 DAYS',
+        radius: 0.58,
+        dist: 5.0,
+        speed: 1.15,
+        colorHex: 0xe3bb76,
+        generator: () => this.generateVenusTexture()
+      },
+      {
+        name: 'EARTH',
+        period: '365 DAYS',
+        radius: 0.68,
+        dist: 6.8,
+        speed: 0.95,
+        colorHex: 0x2b82c9,
+        hasMoon: true,
+        generator: () => this.generateEarthTexture()
+      },
+      {
+        name: 'MARS',
+        period: '687 DAYS',
+        radius: 0.45,
+        dist: 8.5,
+        speed: 0.75,
+        colorHex: 0xc1440e,
+        generator: () => this.generateMarsTexture()
+      },
+      {
+        name: 'JUPITER',
+        period: '12 YEARS',
+        radius: 1.25,
+        dist: 11.2,
+        speed: 0.45,
+        colorHex: 0xd8ca9d,
+        generator: () => this.generateJupiterTexture()
+      },
+      {
+        name: 'SATURN',
+        period: '30 YEARS',
+        radius: 1.02,
+        dist: 14.4,
+        speed: 0.32,
+        colorHex: 0xe2bf7d,
+        hasRings: true,
+        generator: () => this.generateSaturnTexture()
+      },
+      {
+        name: 'URANUS',
+        period: '84 YEARS',
+        radius: 0.68,
+        dist: 17.5,
+        speed: 0.22,
+        colorHex: 0x70d6ff,
+        generator: () => this.generateUranusTexture()
+      },
+      {
+        name: 'NEPTUNE',
+        period: '165 YEARS',
+        radius: 0.65,
+        dist: 20.5,
+        speed: 0.17,
+        colorHex: 0x274687,
+        generator: () => this.generateNeptuneTexture()
+      },
+      {
+        name: 'PLUTO',
+        period: '248 YEARS',
+        radius: 0.26,
+        dist: 23.2,
+        speed: 0.12,
+        colorHex: 0x968570,
+        generator: () => this.generatePlutoTexture()
+      }
+    ];
 
-    const ringTexture = this.generateRingCanvasTexture();
-    this.ringMat = new THREE.MeshStandardMaterial({
-      map: ringTexture,
-      side: THREE.DoubleSide,
-      transparent: true,
-      opacity: 0.82,
-      roughness: 0.8
+    planetSpecs.forEach((spec, idx) => {
+      // 1. Orbital Trajectory Line (Elliptical Ring matching reference)
+      const orbitCurve = new THREE.EllipseCurve(
+        0, 0,
+        spec.dist, spec.dist * 0.94, // Subtle realistic ellipticity
+        0, 2 * Math.PI,
+        false, 0
+      );
+      const orbitPoints = orbitCurve.getPoints(96);
+      const orbitGeo = new THREE.BufferGeometry().setFromPoints(
+        orbitPoints.map(p => new THREE.Vector3(p.x, 0, p.y))
+      );
+      const orbitMat = new THREE.LineBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.18
+      });
+      const orbitLine = new THREE.Line(orbitGeo, orbitMat);
+      orbitLine.rotation.x = THREE.MathUtils.degToRad(3.0 * (idx % 3 - 1));
+      this.solarSystemGroup.add(orbitLine);
+      this.orbitLines.push(orbitLine);
+
+      // 2. Planet Mesh
+      const pGeo = new THREE.SphereGeometry(spec.radius, 32, 32);
+      const pTex = spec.generator();
+      const pMat = new THREE.MeshStandardMaterial({
+        map: pTex,
+        roughness: 0.6,
+        metalness: 0.1
+      });
+      const planetMesh = new THREE.Mesh(pGeo, pMat);
+
+      // Planet Holder to manage orbital position
+      const planetHolder = new THREE.Group();
+      planetHolder.add(planetMesh);
+
+      // 3. World Label Sprite (Name & Orbital Period from reference diagram)
+      const labelTex = this.createPlanetLabelTexture(spec.name, spec.period);
+      const labelMat = new THREE.SpriteMaterial({
+        map: labelTex,
+        transparent: true,
+        depthWrite: false
+      });
+      const labelSprite = new THREE.Sprite(labelMat);
+      const labelScale = Math.max(1.8, spec.radius * 2.2);
+      labelSprite.scale.set(labelScale, labelScale * 0.5, 1.0);
+      labelSprite.position.set(0, spec.radius + (labelScale * 0.42), 0);
+      planetHolder.add(labelSprite);
+
+      // 4. Special Additions (Saturn's Rings & Earth's Moon)
+      if (spec.hasRings) {
+        const ringGeo = new THREE.RingGeometry(spec.radius * 1.35, spec.radius * 2.3, 64);
+        ringGeo.rotateX(Math.PI / 2);
+        const ringTex = this.generateSaturnRingsTexture();
+        const ringMat = new THREE.MeshStandardMaterial({
+          map: ringTex,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.85
+        });
+        const rings = new THREE.Mesh(ringGeo, ringMat);
+        rings.rotation.z = THREE.MathUtils.degToRad(26.7);
+        planetMesh.add(rings);
+      }
+
+      if (spec.hasMoon) {
+        const moonGeo = new THREE.SphereGeometry(0.18, 16, 16);
+        const moonMat = new THREE.MeshStandardMaterial({ color: 0xcccccc, roughness: 0.9 });
+        const moon = new THREE.Mesh(moonGeo, moonMat);
+        moon.position.set(1.2, 0.3, 0);
+        planetMesh.add(moon);
+        planetMesh.userData.moon = moon;
+      }
+
+      // Initial angle spread
+      const initialAngle = (idx / planetSpecs.length) * Math.PI * 2 + 0.5;
+      planetHolder.position.set(
+        Math.cos(initialAngle) * spec.dist,
+        0,
+        Math.sin(initialAngle) * spec.dist * 0.94
+      );
+
+      planetHolder.userData = {
+        name: spec.name,
+        period: spec.period,
+        distX: spec.dist,
+        distZ: spec.dist * 0.94,
+        angle: initialAngle,
+        speed: spec.speed,
+        rotSpeed: 0.02 / spec.speed,
+        colorHex: spec.colorHex,
+        mesh: planetMesh,
+        label: labelSprite
+      };
+
+      this.solarSystemGroup.add(planetHolder);
+      this.planets.push(planetHolder);
     });
-    this.ringsMesh = new THREE.Mesh(ringGeo, this.ringMat);
-
-    // Realistic planetary axial tilt (24.5 degrees)
-    this.planetGroup.rotation.z = THREE.MathUtils.degToRad(-24.5);
-    this.planetGroup.rotation.x = THREE.MathUtils.degToRad(8.0);
-    this.planetGroup.add(this.ringsMesh);
-
-    this.scene.add(this.planetGroup);
   }
 
   /**
-   * Procedural Planet Surface Texture Generator
+   * Procedural Canvas Sprite for floating World Name & Orbital Period tags
+   * Exactly matching the user's reference diagram
    */
-  generatePlanetCanvasTexture() {
+  createPlanetLabelTexture(name, period) {
     const canvas = document.createElement('canvas');
-    canvas.width = 1024;
-    canvas.height = 512;
+    canvas.width = 256;
+    canvas.height = 128;
     const ctx = canvas.getContext('2d');
 
-    // Deep Ocean Base
-    const oceanGrad = ctx.createLinearGradient(0, 0, 0, 512);
-    oceanGrad.addColorStop(0, '#0a1d37');
-    oceanGrad.addColorStop(0.5, '#051226');
-    oceanGrad.addColorStop(1, '#020914');
-    ctx.fillStyle = oceanGrad;
-    ctx.fillRect(0, 0, 1024, 512);
-
-    // Procedural Continents (Organic Noise Blobs)
-    ctx.fillStyle = '#1e3f2b'; // Emerald Forest Landmass
-    for (let i = 0; i < 35; i++) {
-      const cx = Math.random() * 1024;
-      const cy = 80 + Math.random() * 352;
-      const r = 40 + Math.random() * 130;
-
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Secondary terrain variations (Canyons & Highlands)
-      ctx.fillStyle = '#2d5a3c';
-      ctx.beginPath();
-      ctx.arc(cx + 15, cy - 10, r * 0.65, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#8f683a'; // Mountain Ridge
-      ctx.beginPath();
-      ctx.arc(cx - 10, cy + 12, r * 0.35, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#1e3f2b';
+    // Subtle dark translucent pill badge
+    ctx.fillStyle = 'rgba(6, 10, 24, 0.72)';
+    if (ctx.roundRect) {
+      ctx.roundRect(8, 8, 240, 112, 14);
+    } else {
+      ctx.fillRect(8, 8, 240, 112);
     }
-
-    // Polar Ice Caps
-    ctx.fillStyle = '#dbeafe';
-    ctx.beginPath();
-    ctx.ellipse(512, 18, 512, 28, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(512, 494, 512, 28, 0, 0, Math.PI * 2);
     ctx.fill();
 
-    // Night-side City Lights (Tiny glowing cyan and gold dots)
-    ctx.fillStyle = '#00f2fe';
-    for (let i = 0; i < 400; i++) {
-      const lx = Math.random() * 1024;
-      const ly = 100 + Math.random() * 312;
-      ctx.fillRect(lx, ly, 1.5, 1.5);
-    }
+    // Golden border
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(251, 191, 36, 0.45)';
+    ctx.stroke();
+
+    // Planet Name (Clean white bold)
+    ctx.textAlign = 'center';
+    ctx.font = '900 24px Orbitron, Inter, sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = '#00f2fe';
+    ctx.shadowBlur = 6;
+    ctx.fillText(name, 128, 52);
+
+    // Orbital Period (Glowing golden yellow)
+    ctx.font = '700 22px Inter, Orbitron, sans-serif';
+    ctx.fillStyle = '#fbbf24';
+    ctx.shadowColor = '#f59e0b';
+    ctx.shadowBlur = 8;
+    ctx.fillText(period, 128, 92);
 
     const texture = new THREE.CanvasTexture(canvas);
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.ClampToEdgeWrapping;
+    texture.minFilter = THREE.LinearFilter;
     return texture;
   }
 
-  /**
-   * Procedural Bump Map for Terrain Relief
-   */
-  generatePlanetBumpTexture() {
+  // --- Procedural Textures for Authentic Planetary Worlds ---
+
+  generateSunTexture() {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
     canvas.height = 256;
     const ctx = canvas.getContext('2d');
 
-    ctx.fillStyle = '#808080';
+    const grad = ctx.createLinearGradient(0, 0, 512, 256);
+    grad.addColorStop(0, '#ff4500');
+    grad.addColorStop(0.3, '#ff8c00');
+    grad.addColorStop(0.6, '#ffd700');
+    grad.addColorStop(1, '#ff3300');
+    ctx.fillStyle = grad;
     ctx.fillRect(0, 0, 512, 256);
 
+    // Turbulent solar plasma flares
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     for (let i = 0; i < 40; i++) {
-      const bx = Math.random() * 512;
-      const by = 40 + Math.random() * 176;
-      const br = 15 + Math.random() * 60;
-      const grad = ctx.createRadialGradient(bx, by, 0, bx, by, br);
-      grad.addColorStop(0, '#ffffff');
-      grad.addColorStop(1, '#808080');
-      ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.arc(bx, by, br, 0, Math.PI * 2);
+      ctx.arc(Math.random() * 512, Math.random() * 256, 15 + Math.random() * 35, 0, Math.PI * 2);
       ctx.fill();
     }
-
     return new THREE.CanvasTexture(canvas);
   }
 
-  /**
-   * Procedural Swirling Cloud Map
-   */
-  generateCloudsCanvasTexture() {
+  generateMercuryTexture() {
     const canvas = document.createElement('canvas');
-    canvas.width = 1024;
-    canvas.height = 512;
+    canvas.width = 256;
+    canvas.height = 128;
     const ctx = canvas.getContext('2d');
 
-    ctx.clearRect(0, 0, 1024, 512);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+    ctx.fillStyle = '#8a8279';
+    ctx.fillRect(0, 0, 256, 128);
 
+    // Craters
+    ctx.fillStyle = '#6e6760';
     for (let i = 0; i < 50; i++) {
-      const cx = Math.random() * 1024;
-      const cy = 50 + Math.random() * 412;
-      const rw = 50 + Math.random() * 160;
-      const rh = 15 + Math.random() * 45;
-
       ctx.beginPath();
-      ctx.ellipse(cx, cy, rw, rh, Math.random() * 0.3, 0, Math.PI * 2);
+      ctx.arc(Math.random() * 256, Math.random() * 128, 4 + Math.random() * 12, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    return new THREE.CanvasTexture(canvas);
+  }
+
+  generateVenusTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+
+    const grad = ctx.createLinearGradient(0, 0, 0, 128);
+    grad.addColorStop(0, '#e8be78');
+    grad.addColorStop(0.5, '#c99346');
+    grad.addColorStop(1, '#dfaf68');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 256, 128);
+
+    // Swirling sulfuric cloud stripes
+    ctx.fillStyle = 'rgba(255, 240, 200, 0.35)';
+    for (let i = 0; i < 15; i++) {
+      ctx.fillRect(0, Math.random() * 128, 256, 4 + Math.random() * 8);
+    }
+    return new THREE.CanvasTexture(canvas);
+  }
+
+  generateEarthTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+
+    // Ocean Base
+    ctx.fillStyle = '#15528a';
+    ctx.fillRect(0, 0, 512, 256);
+
+    // Continents
+    ctx.fillStyle = '#2d6a4f';
+    for (let i = 0; i < 20; i++) {
+      ctx.beginPath();
+      ctx.arc(Math.random() * 512, 40 + Math.random() * 176, 25 + Math.random() * 60, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.ClampToEdgeWrapping;
-    return texture;
+    // Swirling Clouds
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    for (let i = 0; i < 18; i++) {
+      ctx.beginPath();
+      ctx.ellipse(Math.random() * 512, Math.random() * 256, 40 + Math.random() * 80, 10 + Math.random() * 20, 0.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    return new THREE.CanvasTexture(canvas);
   }
 
-  /**
-   * Procedural Planetary Ring Bands Texture
-   */
-  generateRingCanvasTexture() {
+  generateMarsTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = '#b4441e';
+    ctx.fillRect(0, 0, 256, 128);
+
+    // Volcanic terrain
+    ctx.fillStyle = '#822709';
+    for (let i = 0; i < 25; i++) {
+      ctx.beginPath();
+      ctx.arc(Math.random() * 256, Math.random() * 128, 8 + Math.random() * 25, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Polar ice caps
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, 256, 6);
+    ctx.fillRect(0, 122, 256, 6);
+    return new THREE.CanvasTexture(canvas);
+  }
+
+  generateJupiterTexture() {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+
+    // Horizontal atmospheric bands
+    const colors = ['#e6c896', '#c98a58', '#f2deb8', '#995a32', '#d6a06c'];
+    let y = 0;
+    while (y < 256) {
+      const h = 8 + Math.random() * 24;
+      ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+      ctx.fillRect(0, y, 512, h);
+      y += h;
+    }
+
+    // Great Red Spot
+    ctx.fillStyle = '#cc3311';
+    ctx.beginPath();
+    ctx.ellipse(320, 160, 42, 22, 0, 0, Math.PI * 2);
+    ctx.fill();
+    return new THREE.CanvasTexture(canvas);
+  }
+
+  generateSaturnTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+
+    const grad = ctx.createLinearGradient(0, 0, 0, 128);
+    grad.addColorStop(0, '#e2c58e');
+    grad.addColorStop(0.4, '#c7a363');
+    grad.addColorStop(0.7, '#e8cf9c');
+    grad.addColorStop(1, '#b89352');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 256, 128);
+    return new THREE.CanvasTexture(canvas);
+  }
+
+  generateSaturnRingsTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
     canvas.height = 1;
     const ctx = canvas.getContext('2d');
 
-    const grad = ctx.createLinearGradient(0, 0, 512, 0);
-    grad.addColorStop(0.0, 'rgba(0, 242, 254, 0.0)');
-    grad.addColorStop(0.15, 'rgba(0, 242, 254, 0.7)');
-    grad.addColorStop(0.35, 'rgba(121, 40, 202, 0.55)');
-    grad.addColorStop(0.5, 'rgba(0, 0, 0, 0.05)'); // Cassini Division Gap
-    grad.addColorStop(0.65, 'rgba(255, 0, 128, 0.6)');
-    grad.addColorStop(0.85, 'rgba(0, 242, 254, 0.45)');
-    grad.addColorStop(1.0, 'rgba(0, 242, 254, 0.0)');
-
+    const grad = ctx.createLinearGradient(0, 0, 256, 0);
+    grad.addColorStop(0.0, 'rgba(215, 185, 135, 0.0)');
+    grad.addColorStop(0.2, 'rgba(215, 185, 135, 0.8)');
+    grad.addColorStop(0.5, 'rgba(50, 40, 30, 0.1)'); // Cassini Gap
+    grad.addColorStop(0.65, 'rgba(195, 165, 115, 0.7)');
+    grad.addColorStop(0.9, 'rgba(225, 195, 145, 0.5)');
+    grad.addColorStop(1.0, 'rgba(215, 185, 135, 0.0)');
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 512, 1);
+    ctx.fillRect(0, 0, 256, 1);
+    return new THREE.CanvasTexture(canvas);
+  }
 
+  generateUranusTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+
+    const grad = ctx.createLinearGradient(0, 0, 0, 128);
+    grad.addColorStop(0, '#7ce8ff');
+    grad.addColorStop(0.5, '#4db8db');
+    grad.addColorStop(1, '#66d3f2');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 256, 128);
+    return new THREE.CanvasTexture(canvas);
+  }
+
+  generateNeptuneTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+
+    const grad = ctx.createLinearGradient(0, 0, 0, 128);
+    grad.addColorStop(0, '#274796');
+    grad.addColorStop(0.5, '#1e3575');
+    grad.addColorStop(1, '#3b62ba');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 256, 128);
+
+    // Azure Storm Streaks
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+    ctx.fillRect(40, 50, 60, 5);
+    ctx.fillRect(150, 80, 80, 6);
+    return new THREE.CanvasTexture(canvas);
+  }
+
+  generatePlutoTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 128;
+    canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = '#9e8d7c';
+    ctx.fillRect(0, 0, 128, 64);
+    ctx.fillStyle = '#c7b8a7';
+    ctx.beginPath();
+    ctx.arc(60, 32, 18, 0, Math.PI * 2); // Tombaugh Regio Heart
+    ctx.fill();
     return new THREE.CanvasTexture(canvas);
   }
 
   /**
-   * Deep Space Universe: 5,000 Multi-Colored Stars,
+   * Deep Space Universe: 6,000 Multi-Colored Stars,
    * Volumetric Nebula Gas Clouds, and Shooting Meteors.
    */
   createUniverse() {
-    // 1. Stellar Starfield
-    const starCount = 5000;
+    const starCount = 6000;
     const starGeo = new THREE.BufferGeometry();
     const positions = new Float32Array(starCount * 3);
     const colors = new Float32Array(starCount * 3);
 
     const stellarPalette = [
-      new THREE.Color(0xdbeafe), // O/B-type bright blue-white
-      new THREE.Color(0xffffff), // A-type pure white
-      new THREE.Color(0xfef08a), // G-type golden sun
+      new THREE.Color(0xdbeafe), // Blue-white giant
+      new THREE.Color(0xffffff), // Bright white
+      new THREE.Color(0xfef08a), // Golden sun
       new THREE.Color(0x00f2fe), // Cyan pulsar
-      new THREE.Color(0xf472b6)  // Soft magenta star
+      new THREE.Color(0xf472b6)  // Magenta star
     ];
 
     for (let i = 0; i < starCount; i++) {
-      const radius = 25 + Math.random() * 85;
+      const radius = 35 + Math.random() * 95;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
 
@@ -377,7 +646,7 @@ class World3D {
     starGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
     const starMat = new THREE.PointsMaterial({
-      size: 0.14,
+      size: 0.16,
       vertexColors: true,
       transparent: true,
       opacity: 0.9,
@@ -387,19 +656,19 @@ class World3D {
     this.starfield = new THREE.Points(starGeo, starMat);
     this.scene.add(this.starfield);
 
-    // 2. Volumetric Cosmic Nebula Clouds
-    const nebulaCount = 600;
+    // Volumetric Cosmic Nebula Clouds
+    const nebulaCount = 700;
     const nebulaGeo = new THREE.BufferGeometry();
     const nebPositions = new Float32Array(nebulaCount * 3);
     const nebColors = new Float32Array(nebulaCount * 3);
 
     for (let i = 0; i < nebulaCount; i++) {
-      const nr = 18 + Math.random() * 30;
+      const nr = 22 + Math.random() * 45;
       const nTheta = Math.random() * Math.PI * 2;
-      const nPhi = (Math.random() - 0.5) * 0.9; // Clustered in celestial plane
+      const nPhi = (Math.random() - 0.5) * 0.8;
 
       nebPositions[i * 3] = nr * Math.cos(nTheta);
-      nebPositions[i * 3 + 1] = nr * Math.sin(nPhi) * 4;
+      nebPositions[i * 3 + 1] = nr * Math.sin(nPhi) * 6;
       nebPositions[i * 3 + 2] = nr * Math.sin(nTheta);
 
       const isCyan = Math.random() > 0.45;
@@ -413,27 +682,20 @@ class World3D {
     nebulaGeo.setAttribute('color', new THREE.BufferAttribute(nebColors, 3));
 
     const nebulaMat = new THREE.PointsMaterial({
-      size: 1.2,
+      size: 1.4,
       vertexColors: true,
       transparent: true,
-      opacity: 0.28,
+      opacity: 0.26,
       blending: THREE.AdditiveBlending
     });
 
     this.nebulaParticles = new THREE.Points(nebulaGeo, nebulaMat);
     this.scene.add(this.nebulaParticles);
 
-    // 3. Initialize Shooting Meteor Generator
-    this.createMeteors();
-  }
-
-  createMeteors() {
-    this.meteorMesh = null;
-    const meteorCount = 3;
-
-    for (let i = 0; i < meteorCount; i++) {
+    // Meteors
+    for (let i = 0; i < 3; i++) {
       const lineGeo = new THREE.BufferGeometry();
-      const pts = new Float32Array([0, 0, 0, -2.5, -1.2, -1.8]);
+      const pts = new Float32Array([0, 0, 0, -3.0, -1.5, -2.0]);
       lineGeo.setAttribute('position', new THREE.BufferAttribute(pts, 3));
 
       const lineMat = new THREE.LineBasicMaterial({
@@ -447,7 +709,7 @@ class World3D {
       line.userData = {
         active: false,
         timer: Math.random() * 6 + 2,
-        speed: 12 + Math.random() * 8
+        speed: 14 + Math.random() * 8
       };
       this.scene.add(line);
       this.meteors.push(line);
@@ -455,98 +717,72 @@ class World3D {
   }
 
   /**
-   * Rebuilds Orbital Task Satellites orbiting around the planet.
-   * Each task is a probe with solar panels and priority beacon.
+   * Rebuilds interactive Task Orbital Probes around the planets.
    */
-  rebuildTaskSatellites(tasks) {
-    while (this.taskSatellitesGroup.children.length > 0) {
-      const child = this.taskSatellitesGroup.children[0];
-      this.taskSatellitesGroup.remove(child);
+  rebuildTaskProbes(tasks) {
+    while (this.taskProbesGroup.children.length > 0) {
+      const child = this.taskProbesGroup.children[0];
+      this.taskProbesGroup.remove(child);
     }
 
     if (!tasks || tasks.length === 0) return;
 
-    const count = tasks.length;
-    const baseOrbitRadius = 6.4;
-
     tasks.forEach((task, index) => {
-      const satelliteGroup = new THREE.Group();
+      const probeGroup = new THREE.Group();
 
-      // Priority Color Assignment
       let priorityColor = 0x00f2fe; // Medium
       if (task.priority === 'high') priorityColor = 0xff4757; // High
       else if (task.priority === 'low') priorityColor = 0x2ed573; // Low
+      if (task.completed) priorityColor = 0x10b981; // Completed
 
-      if (task.completed) {
-        priorityColor = 0x10b981; // Emerald Completed
-      }
-
-      // 1. Central Core Probe
-      const coreGeo = new THREE.DodecahedronGeometry(task.completed ? 0.32 : 0.4, 0);
-      const coreMat = new THREE.MeshStandardMaterial({
+      // 1. Crystal Satellite Body
+      const probeGeo = new THREE.OctahedronGeometry(task.completed ? 0.28 : 0.36, 0);
+      const probeMat = new THREE.MeshStandardMaterial({
         color: priorityColor,
         emissive: priorityColor,
-        emissiveIntensity: task.completed ? 0.9 : 0.5,
-        metalness: 0.85,
+        emissiveIntensity: task.completed ? 1.0 : 0.6,
+        metalness: 0.8,
         roughness: 0.2,
         wireframe: this.isWireframe
       });
-      const coreMesh = new THREE.Mesh(coreGeo, coreMat);
-      satelliteGroup.add(coreMesh);
+      const probeMesh = new THREE.Mesh(probeGeo, probeMat);
+      probeGroup.add(probeMesh);
 
-      // 2. Solar Panel Array Wings
-      const wingGeo = new THREE.BoxGeometry(1.3, 0.04, 0.35);
+      // 2. Dual Solar Wings
+      const wingGeo = new THREE.BoxGeometry(1.1, 0.03, 0.3);
       const wingMat = new THREE.MeshStandardMaterial({
         color: 0x1e293b,
         metalness: 0.9,
-        roughness: 0.3,
         emissive: 0x00f2fe,
-        emissiveIntensity: 0.2
+        emissiveIntensity: 0.25
       });
       const wings = new THREE.Mesh(wingGeo, wingMat);
-      satelliteGroup.add(wings);
+      probeGroup.add(wings);
 
-      // 3. Orbital Beacon Light
-      const beaconGeo = new THREE.SphereGeometry(0.12, 12, 12);
-      const beaconMat = new THREE.MeshBasicMaterial({ color: priorityColor });
-      const beacon = new THREE.Mesh(beaconGeo, beaconMat);
-      beacon.position.y = 0.45;
-      satelliteGroup.add(beacon);
+      // Assign to orbit around a specific planet
+      const targetPlanetIndex = (index + 2) % this.planets.length; // Orbit Earth, Mars, Jupiter, etc.
+      const assignedPlanet = this.planets[targetPlanetIndex];
 
-      // 4. Orbital Path Radius and Inclination
-      const orbitRadius = baseOrbitRadius + (index % 3) * 0.7;
-      const angle = (index / count) * Math.PI * 2;
-      const inclination = (index % 2 === 0 ? 1 : -1) * 0.35;
-
-      satelliteGroup.position.set(
-        Math.cos(angle) * orbitRadius,
-        Math.sin(angle) * orbitRadius * inclination,
-        Math.sin(angle) * orbitRadius
-      );
-
-      satelliteGroup.userData = {
+      probeGroup.userData = {
         taskId: task.id,
         taskTitle: task.title,
         priority: task.priority,
         completed: task.completed,
-        orbitRadius: orbitRadius,
-        orbitAngle: angle,
-        orbitSpeed: 0.25 + (index % 4) * 0.08,
-        inclination: inclination
+        planetHolder: assignedPlanet,
+        orbitRadius: (assignedPlanet ? assignedPlanet.userData.mesh.geometry.parameters.radius : 1) + 0.85,
+        localAngle: Math.random() * Math.PI * 2,
+        localSpeed: 1.2 + Math.random() * 0.8
       };
 
-      this.taskSatellitesGroup.add(satelliteGroup);
+      this.taskProbesGroup.add(probeGroup);
     });
 
     const countElem = document.getElementById('matrix-crystal-count');
-    if (countElem) countElem.innerText = `${tasks.length} Satellites In Orbit`;
+    if (countElem) countElem.innerText = `${tasks.length} Probes In Planetary Orbit`;
   }
 
-  /**
-   * Planetary Ion Fireworks celebration burst on task completion
-   */
   createTaskBurst(x, y, z, colorHex = 0x10b981) {
-    const burstCount = 70;
+    const burstCount = 75;
     const geo = new THREE.BufferGeometry();
     const positions = new Float32Array(burstCount * 3);
     const velocities = [];
@@ -557,16 +793,16 @@ class World3D {
       positions[i * 3 + 2] = z;
 
       velocities.push(new THREE.Vector3(
-        (Math.random() - 0.5) * 5,
-        (Math.random() - 0.5) * 5,
-        (Math.random() - 0.5) * 5
+        (Math.random() - 0.5) * 6,
+        (Math.random() - 0.5) * 6,
+        (Math.random() - 0.5) * 6
       ));
     }
 
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     const mat = new THREE.PointsMaterial({
       color: colorHex,
-      size: 0.16,
+      size: 0.18,
       transparent: true,
       opacity: 1.0,
       blending: THREE.AdditiveBlending
@@ -586,29 +822,34 @@ class World3D {
   bindEvents() {
     window.addEventListener('resize', () => this.onResize());
 
-    // Mouse movement tracking for parallax and raycasting
+    // Mouse movement tracking
     window.addEventListener('mousemove', (e) => {
       this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
-      this.targetMouse.x = (e.clientX - window.innerWidth / 2) * 0.0008;
-      this.targetMouse.y = (e.clientY - window.innerHeight / 2) * 0.0008;
+      this.targetMouse.x = (e.clientX - window.innerWidth / 2) * 0.0006;
+      this.targetMouse.y = (e.clientY - window.innerHeight / 2) * 0.0006;
     });
 
-    // Raycaster Click on Orbital Satellite
+    // Raycaster Click on Planet or Probe
     window.addEventListener('click', (e) => {
       if (e.target.closest('button, input, select, a, .task-item, .task-create-card, .modal-card')) {
         return;
       }
 
       this.raycaster.setFromCamera(this.mouse, this.camera);
-      const intersects = this.raycaster.intersectObjects(this.taskSatellitesGroup.children, true);
+      const allInteractables = [
+        ...this.taskProbesGroup.children,
+        ...this.planets.map(p => p.userData.mesh)
+      ];
+      const intersects = this.raycaster.intersectObjects(allInteractables, true);
 
       if (intersects.length > 0) {
         let root = intersects[0].object;
-        while (root.parent && root.parent !== this.taskSatellitesGroup) {
+        while (root.parent && root.parent !== this.taskProbesGroup && !root.userData.name) {
           root = root.parent;
         }
 
+        // If clicked on Task Probe
         if (root.userData && root.userData.taskId) {
           const taskId = root.userData.taskId;
           if (window.soundEngine) window.soundEngine.playClick();
@@ -623,23 +864,23 @@ class World3D {
       }
     });
 
-    // Scroll listener for 3D Camera Trajectory
+    // Scroll listener
     window.addEventListener('scroll', () => {
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
       this.targetScrollProgress = maxScroll > 0 ? Math.min(Math.max(window.scrollY / maxScroll, 0), 1) : 0;
     }, { passive: true });
 
-    // Reactive State updates from TodoManager
+    // Reactive State updates
     window.addEventListener('tasksUpdated', (e) => {
-      this.rebuildTaskSatellites(e.detail.tasks);
+      this.rebuildTaskProbes(e.detail.tasks);
     });
 
     // Task celebration trigger
     window.addEventListener('taskCompletedCelebration', (e) => {
       const task = e.detail.task;
-      const sat = this.taskSatellitesGroup.children.find(c => c.userData.taskId === task.id);
-      if (sat) {
-        this.createTaskBurst(sat.position.x, sat.position.y, sat.position.z, 0x10b981);
+      const probe = this.taskProbesGroup.children.find(c => c.userData.taskId === task.id);
+      if (probe) {
+        this.createTaskBurst(probe.position.x, probe.position.y, probe.position.z, 0x10b981);
       } else {
         this.createTaskBurst(0, 0, 0, 0x10b981);
       }
@@ -653,11 +894,8 @@ class World3D {
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   }
 
-  /**
-   * Smooth Camera Trajectory interpolation across scrolling sections
-   */
   updateCameraByScroll() {
-    this.scrollProgress += (this.targetScrollProgress - this.scrollProgress) * 0.07;
+    this.scrollProgress += (this.targetScrollProgress - this.scrollProgress) * 0.065;
 
     const totalKeyframes = this.cameraKeyframes.length;
     const scaledIndex = this.scrollProgress * (totalKeyframes - 1);
@@ -672,11 +910,11 @@ class World3D {
     const targetLookAt = new THREE.Vector3().lerpVectors(fromKf.target, toKf.target, segmentProgress);
 
     // Subtle cosmic parallax with mouse
-    targetPos.x += this.targetMouse.x * 1.8;
-    targetPos.y -= this.targetMouse.y * 1.8;
+    targetPos.x += this.targetMouse.x * 2.2;
+    targetPos.y -= this.targetMouse.y * 2.2;
 
-    this.currentCameraPos.lerp(targetPos, 0.055);
-    this.currentCameraTarget.lerp(targetLookAt, 0.055);
+    this.currentCameraPos.lerp(targetPos, 0.05);
+    this.currentCameraTarget.lerp(targetLookAt, 0.05);
 
     this.camera.position.copy(this.currentCameraPos);
     this.camera.lookAt(this.currentCameraTarget);
@@ -688,95 +926,81 @@ class World3D {
     const delta = this.clock.getDelta();
     const elapsedTime = this.clock.getElapsedTime();
 
-    // 1. Update Camera along Scroll Trajectory
+    // 1. Camera Scroll Trajectory
     this.updateCameraByScroll();
 
-    // 2. Planet & Cloud Rotation
-    if (this.planetMesh) {
-      this.planetMesh.rotation.y += 0.0018 * this.rotationSpeed;
+    // 2. Central Sun Corona Pulse & Rotation
+    if (this.sunMesh) {
+      this.sunMesh.rotation.y += 0.003 * this.rotationSpeed;
     }
-    if (this.cloudsMesh) {
-      this.cloudsMesh.rotation.y += 0.0028 * this.rotationSpeed;
+    if (this.sunCorona) {
+      const pulse = 1 + Math.sin(elapsedTime * 2.5) * 0.04;
+      this.sunCorona.scale.set(pulse, pulse, pulse);
     }
 
-    // 3. Universe Starfield & Nebula Drift
+    // 3. Planetary Orbital Revolution & Axial Rotation
+    this.planets.forEach(holder => {
+      const data = holder.userData;
+      if (!data) return;
+
+      // Advance orbital revolution around Sun
+      data.angle += 0.0035 * data.speed * this.rotationSpeed;
+
+      holder.position.x = Math.cos(data.angle) * data.distX;
+      holder.position.z = Math.sin(data.angle) * data.distZ;
+
+      // Axial rotation of the planet itself
+      if (data.mesh) {
+        data.mesh.rotation.y += data.rotSpeed * this.rotationSpeed;
+        if (data.mesh.userData.moon) {
+          data.mesh.userData.moon.rotation.y += 0.02;
+        }
+      }
+    });
+
+    // 4. Update Task Orbital Probes relative to their parent planet
+    this.taskProbesGroup.children.forEach(probe => {
+      const data = probe.userData;
+      if (!data || !data.planetHolder) return;
+
+      data.localAngle += 0.015 * data.localSpeed * this.rotationSpeed;
+      const pPos = data.planetHolder.position;
+
+      probe.position.x = pPos.x + Math.cos(data.localAngle) * data.orbitRadius;
+      probe.position.y = pPos.y + Math.sin(data.localAngle * 0.7) * (data.orbitRadius * 0.5);
+      probe.position.z = pPos.z + Math.sin(data.localAngle) * data.orbitRadius;
+
+      probe.rotation.y += 0.02 * this.rotationSpeed;
+    });
+
+    // 5. Deep Space Universe Drift & Meteors
     if (this.starfield) {
-      this.starfield.rotation.y = elapsedTime * 0.003 * this.rotationSpeed;
+      this.starfield.rotation.y = elapsedTime * 0.0015 * this.rotationSpeed;
     }
     if (this.nebulaParticles) {
-      this.nebulaParticles.rotation.y = elapsedTime * 0.005 * this.rotationSpeed;
+      this.nebulaParticles.rotation.y = elapsedTime * 0.0025 * this.rotationSpeed;
     }
 
-    // 4. Update Shooting Meteors
     this.meteors.forEach(meteor => {
       meteor.userData.timer -= delta;
       if (meteor.userData.timer <= 0) {
-        // Spawn meteor
         meteor.position.set(
-          -15 + Math.random() * 30,
-          10 + Math.random() * 10,
-          -5 + Math.random() * 10
+          -20 + Math.random() * 40,
+          12 + Math.random() * 12,
+          -10 + Math.random() * 15
         );
-        meteor.material.opacity = 0.9;
-        meteor.userData.timer = Math.random() * 8 + 4;
+        meteor.material.opacity = 0.95;
+        meteor.userData.timer = Math.random() * 7 + 3;
         meteor.userData.active = true;
       }
 
       if (meteor.userData.active) {
         meteor.position.x += meteor.userData.speed * delta;
-        meteor.position.y -= meteor.userData.speed * 0.6 * delta;
+        meteor.position.y -= meteor.userData.speed * 0.55 * delta;
         meteor.material.opacity -= 0.02;
         if (meteor.material.opacity <= 0) {
           meteor.userData.active = false;
         }
-      }
-    });
-
-    // 5. Orbital Task Satellites Animation & Hover Raycasting
-    this.raycaster.setFromCamera(this.mouse, this.camera);
-    const intersects = this.raycaster.intersectObjects(this.taskSatellitesGroup.children, true);
-
-    let newlyHovered = null;
-    if (intersects.length > 0) {
-      let rootObj = intersects[0].object;
-      while (rootObj.parent && rootObj.parent !== this.taskSatellitesGroup) {
-        rootObj = rootObj.parent;
-      }
-      newlyHovered = rootObj;
-    }
-
-    if (newlyHovered !== this.hoveredSatellite) {
-      if (this.hoveredSatellite) {
-        document.body.style.cursor = 'default';
-        this.hoveredSatellite.scale.set(1, 1, 1);
-      }
-      if (newlyHovered) {
-        document.body.style.cursor = 'pointer';
-        if (window.soundEngine) window.soundEngine.playHover();
-      }
-      this.hoveredSatellite = newlyHovered;
-    }
-
-    // Orbit Mechanics
-    this.taskSatellitesGroup.children.forEach(satellite => {
-      const data = satellite.userData;
-      if (!data) return;
-
-      // Update orbital angle around planet
-      data.orbitAngle += 0.005 * data.orbitSpeed * this.rotationSpeed;
-
-      const x = Math.cos(data.orbitAngle) * data.orbitRadius;
-      const y = Math.sin(data.orbitAngle) * data.orbitRadius * data.inclination;
-      const z = Math.sin(data.orbitAngle) * data.orbitRadius;
-
-      satellite.position.set(x, y, z);
-      satellite.rotation.y += 0.02 * this.rotationSpeed;
-
-      // Hover expansion
-      if (satellite === this.hoveredSatellite) {
-        satellite.scale.lerp(new THREE.Vector3(1.4, 1.4, 1.4), 0.2);
-      } else {
-        satellite.scale.lerp(new THREE.Vector3(1, 1, 1), 0.1);
       }
     });
 
@@ -803,21 +1027,14 @@ class World3D {
       }
     }
 
-    // 7. Render Frame
+    // 7. Render
     this.renderer.render(this.scene, this.camera);
   }
 
-  // Matrix HUD Controls API
   toggleWireframe() {
     this.isWireframe = !this.isWireframe;
-    if (this.planetMat) this.planetMat.wireframe = this.isWireframe;
-    if (this.cloudsMat) this.cloudsMat.wireframe = this.isWireframe;
-    if (this.ringMat) this.ringMat.wireframe = this.isWireframe;
-
-    this.taskSatellitesGroup.children.forEach(sat => {
-      sat.children.forEach(part => {
-        if (part.material) part.material.wireframe = this.isWireframe;
-      });
+    this.planets.forEach(p => {
+      if (p.userData.mesh) p.userData.mesh.material.wireframe = this.isWireframe;
     });
     return this.isWireframe;
   }
@@ -830,6 +1047,16 @@ class World3D {
   resetCamera() {
     this.targetScrollProgress = 0;
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  focusToPlanet(planetName) {
+    const planet = this.planets.find(p => p.userData && p.userData.name.toUpperCase() === planetName.toUpperCase());
+    if (planet) {
+      const pPos = planet.position;
+      this.currentCameraTarget.set(pPos.x, pPos.y, pPos.z);
+      this.currentCameraPos.set(pPos.x + 3.0, pPos.y + 1.8, pPos.z + 4.2);
+      if (window.soundEngine) window.soundEngine.playChime();
+    }
   }
 }
 

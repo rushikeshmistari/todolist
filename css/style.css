@@ -554,6 +554,64 @@ main {
   position: relative;
 }
 
+/* --- Planetary Worlds Reference Navigation Strip --- */
+.worlds-nav-strip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  background: rgba(4, 6, 14, 0.75);
+  border-bottom: var(--border-glass);
+}
+
+.world-nav-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-full);
+  padding: 0.35rem 0.75rem;
+  font-family: var(--font-display);
+  font-size: 0.68rem;
+  color: #e2e8f0;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.world-nav-pill:hover {
+  background: rgba(251, 191, 36, 0.15);
+  border-color: rgba(251, 191, 36, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(251, 191, 36, 0.25);
+  color: #ffffff;
+}
+
+.world-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.world-name {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.world-period {
+  color: #fbbf24;
+  font-weight: 700;
+  font-size: 0.62rem;
+  background: rgba(251, 191, 36, 0.12);
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(251, 191, 36, 0.25);
+}
+
 .matrix-hud-bar {
   display: flex;
   align-items: center;

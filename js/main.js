@@ -356,6 +356,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /**
+   * World Telemetry Pills Click Handler (Focus to Planet)
+   */
+  document.querySelectorAll('.world-nav-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const planetName = pill.getAttribute('data-planet');
+      if (window.world3D && planetName) {
+        window.world3D.focusToPlanet(planetName);
+        document.querySelectorAll('.world-nav-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        if (window.soundEngine) window.soundEngine.playClick();
+      }
+    });
+  });
+
+  /**
    * Data Actions: Export, Import, Clear Completed
    */
   if (btnExport) {
